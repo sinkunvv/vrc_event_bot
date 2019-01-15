@@ -9,8 +9,8 @@ const { google } = require('googleapis');
 
 // setting
 const config = {
-  channelSecret: process.env.CHANNEL_ACCESS_TOKEN,
-  channelAccessToken: process.env.CHANNEL_ACCESS_TOKEN
+  channelSecret: process.env.LINE_CHANNEL_SECRET,
+  channelAccessToken: process.env.LINE_CHANNEL_ACCESS_TOKEN
 };
 const PORT = process.env.PORT || 3000;
 const app = express();
@@ -50,13 +50,7 @@ const handleEvent = event => {
 
 // イベント予定取得起動用
 const getEvents = userId => {
-  fs.readFile('credentials.json', (err, content) => {
-    if (err) {
-      return console.log('Error loading client secret file', err);
-    }
-    // 成功したなら予定を取得
-    authorize(listEvents, userId);
-  });
+  authorize(listEvents, userId);
 };
 
 // token.json の更新
@@ -69,9 +63,9 @@ const storeToken = token => {
 // GoogleAPI に接続
 const authorize = (callback, userId) => {
   const OAuth2Client = new google.auth.OAuth2(
-    client_id,
-    client_secret,
-    redirect_uris[0]
+    process.env.GOOGLE_CLIENT_ID,
+    process.env.GOOGLE_CLIENT_SECRET,
+    process.env.GOOGLE_REDIRECT_URL
   );
 
   // tokenファイルが読み込めないなら取得
