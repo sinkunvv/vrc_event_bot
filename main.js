@@ -120,10 +120,11 @@ const listEvents = (auth, userId) => {
   let year = now.getFullYear();
   let month = now.getMonth() + 1;
   let day = now.getDate() + 1;
-  let timeMax = new Date(year + '/' + month + '/' + (day + 1)).toISOString();
-  let timeMin = new Date(year + '/' + month + '/' + day).toISOString();
+  let timeMax = new Date(year + '/' + month + '/' + (day + 1));
+  let timeMin = new Date(year + '/' + month + '/' + day);
   let date = '終日予定';
-  let vrcEvent = '';
+  timeMin.setTime(timeMin.getTime() + 1000 * 60 * 60 * 9);
+  timeMax.setTime(timeMax.getTime() + 1000 * 60 * 60 * 9);
 
   calendar.events.list(
     {
