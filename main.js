@@ -39,7 +39,12 @@ const handleEvent = event => {
 
   if (event.message.text == '今日の予定') {
     message = '確認中です...';
-    getEvents(event.source.userId);
+    getEvents(event.source.userId, 0);
+  }
+
+  if (event.message.text == '明日の予定') {
+    message = '確認中です...';
+    getEvents(event.source.userId, 1);
   }
 
   return client.replyMessage(event.replyToken, {
@@ -49,7 +54,8 @@ const handleEvent = event => {
 };
 
 // イベント予定取得起動用
-const getEvents = userId => {
+const getEvents = (userId, days) => {
+  global.days = days;
   authorize(listEvents, userId);
 };
 
@@ -120,7 +126,7 @@ const listEvents = (auth, userId) => {
   let now = new Date();
   let year = now.getFullYear();
   let month = now.getMonth() + 1;
-  let day = now.getDate();
+  let day = now.getDate() + global.days;
   let today = new Date(year + '/' + month + '/' + day);
   today.setTime(today.getTime() + 1000 * 60 * 60 * 9);
   let tomorrow = new Date(today);
