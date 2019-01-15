@@ -162,7 +162,6 @@ const listEvents = (auth, userId) => {
       }
     }
   );
-  return vrcEvent;
 };
 
 const formatTime = date => {
