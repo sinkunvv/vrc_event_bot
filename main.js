@@ -116,15 +116,17 @@ const getAccessToken = (OAuth2Client, callback, userId) => {
 // Google カレンダーから予定を取得
 const listEvents = (auth, userId) => {
   const calendar = google.calendar({ version: 'v3', auth });
+  let date = '終日予定';
   let now = new Date();
   let year = now.getFullYear();
   let month = now.getMonth() + 1;
-  let day = now.getDate() + 1;
-  let timeMax = new Date(year + '/' + month + '/' + (day + 1));
-  let timeMin = new Date(year + '/' + month + '/' + day);
-  let date = '終日予定';
-  timeMin.setTime(timeMin.getTime() + 1000 * 60 * 60 * 9);
-  timeMax.setTime(timeMax.getTime() + 1000 * 60 * 60 * 9);
+  let day = now.getDate();
+  let today = new Date(year + '/' + month + '/' + day);
+  today.setTime(today.getTime() + 1000 * 60 * 60 * 9);
+  let tomorrow = new Date(today);
+  tomorrow.setDate(tomorrow.getDate() + 1);
+  let timeMin = new Date(today).toISOString();
+  let timeMax = new Date(tomorrow).toISOString();
 
   calendar.events.list(
     {
