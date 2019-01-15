@@ -174,6 +174,9 @@ const formatTime = date => {
   let hh = date.getHours();
   let mm = date.getMinutes();
 
+  // JST
+  hh += 9;
+
   // 0padding
   if (mm < 10) {
     mm = '0' + mm;
