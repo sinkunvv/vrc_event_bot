@@ -166,7 +166,7 @@ const listEvents = (auth, lineEvent) => {
             text: `${date} - ${event.summary}\n${description}`
           });
         });
-        console.log(lineEvent, messages);
+        // console.log(lineEvent, messages);
         client.replyMessage(lineEvent.replyToken, messages);
       } else {
         client.replyMessage(lineEvent.replyToken, {
