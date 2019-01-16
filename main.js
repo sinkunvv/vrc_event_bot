@@ -130,7 +130,7 @@ const listEvents = (auth, lineEvent) => {
   let timeMin = new Date(today).toISOString();
   let timeMax = new Date(tomorrow).toISOString();
   let date = '終日予定';
-  let list = '【イベント一覧】(hee)\n';
+  let list = '【イベント一覧】\n';
   let count = 0;
   let messages = [];
 
