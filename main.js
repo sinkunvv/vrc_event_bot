@@ -35,28 +35,24 @@ const handleEvent = event => {
   if (event.type !== 'message' || event.message.type !== 'text') {
     return Promise.resolve(null);
   }
-  let message = 'すみません、よくわかりません。';
-
-  if (event.message.text == 'Today Events') {
-    message = 'cheking...';
-    getEvents(event.source.userId, 0);
+  switch (event.message.text) {
+    case '今日のイベント':
+      return getEvents(event, 0);
+    case '明日のイベント':
+      return getEvents(event, 1);
+    default:
+      return client.replyMessage(event.replyToken, {
+        type:
+          'すみません、〈今日のイベント〉か〈明日のイベント〉と発言してみてください。',
+        text: message
+      });
   }
-
-  if (event.message.text == 'Tomorrow Events') {
-    message = 'cheking...';
-    getEvents(event.source.userId, 1);
-  }
-
-  return client.replyMessage(event.replyToken, {
-    type: 'text',
-    text: message
-  });
 };
 
 // イベント予定取得起動用
-const getEvents = (userId, days) => {
+const getEvents = (lineEvent, days) => {
   global.days = days;
-  authorize(listEvents, userId);
+  authorize(listEvents, lineEvent);
 };
 
 // token.json の更新
@@ -67,7 +63,7 @@ const storeToken = token => {
 };
 
 // GoogleAPI に接続
-const authorize = (callback, userId) => {
+const authorize = (callback, lineEvent) => {
   const OAuth2Client = new google.auth.OAuth2(
     process.env.GOOGLE_CLIENT_ID,
     process.env.GOOGLE_CLIENT_SECRET,
@@ -77,7 +73,7 @@ const authorize = (callback, userId) => {
   // tokenファイルが読み込めないなら取得
   fs.readFile(TOKEN_PATH, (err, token) => {
     if (err) {
-      return getAccessToken(OAuth2Client, callback, userId);
+      return getAccessToken(OAuth2Client, callback, lineEvent);
     }
 
     OAuth2Client.setCredentials(JSON.parse(token));
@@ -89,12 +85,12 @@ const authorize = (callback, userId) => {
       OAuth2Client.setCredentials(tokens);
       storeToken(tokens);
     });
-    callback(OAuth2Client, userId);
+    callback(OAuth2Client, lineEvent);
   });
 };
 
 // GooleAPI からAccessTokenを取得
-const getAccessToken = (OAuth2Client, callback, userId) => {
+const getAccessToken = (OAuth2Client, callback, lineEvent) => {
   const authURL = OAuth2Client.generateAuthUrl({
     access_type: 'offline',
     scope: SCOPES
@@ -114,13 +110,13 @@ const getAccessToken = (OAuth2Client, callback, userId) => {
       }
       OAuth2Client.setCredentials(token);
       storeToken(token);
-      callback(OAuth2Client, userId);
+      callback(OAuth2Client, lineEvent);
     });
   });
 };
 
 // Google カレンダーから予定を取得
-const listEvents = (auth, userId) => {
+const listEvents = (auth, lineEvent) => {
   const calendar = google.calendar({ version: 'v3', auth });
   let date = '終日予定';
   let now = new Date();
@@ -134,11 +130,14 @@ const listEvents = (auth, userId) => {
   let timeMin = new Date(today).toISOString();
   let timeMax = new Date(tomorrow).toISOString();
 
+  let messages = [];
+
   calendar.events.list(
     {
       calendarId: '1b1et1slg27jm1rgdltu3mn2j4@group.calendar.google.com',
       timeMax: timeMax,
       timeMin: timeMin,
+      maxResults: 5,
       singleEvents: true,
       orderBy: 'startTime'
     },
@@ -151,17 +150,26 @@ const listEvents = (auth, userId) => {
       if (events.length) {
         events.map((event, i) => {
           const start = event.start.dateTime;
+          let description = '';
           if (start) {
             date = formatTime(new Date(start));
           }
 
-          client.pushMessage(userId, {
+          // 備考スクレイピング
+          let index = event.description.indexOf('【備考】');
+          if (index !== -1) {
+            description = event.description.slice(index);
+          }
+
+          messages.push({
             type: 'text',
-            text: `${date} - ${event.summary}`
+            text: `${date} - ${event.summary}\n${description}`
           });
         });
+        console.log(lineEvent, messages);
+        client.replyMessage(lineEvent.replyToken, messages);
       } else {
-        client.pushMessage(userId, {
+        client.replyMessage(lineEvent.replyToken, {
           type: 'text',
           text: '今日はイベントが登録されていないみたい'
         });
