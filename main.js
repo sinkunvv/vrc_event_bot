@@ -127,9 +127,11 @@ const listEvents = (auth, lineEvent) => {
   today.setTime(today.getTime() + 1000 * 60 * 60 * 9);
   let tomorrow = new Date(today);
   tomorrow.setDate(tomorrow.getDate() + 1);
+  now.setTime(now.getTime() + 1000 * 60 * 60 * 9);
   let timeMin = new Date(today).toISOString();
   let timeMax = new Date(tomorrow).toISOString();
-
+  let list = '';
+  let count = 0;
   let messages = [];
 
   calendar.events.list(
@@ -149,25 +151,42 @@ const listEvents = (auth, lineEvent) => {
       }
       const events = res.data.items;
       if (events.length) {
+        // イベント一覧枠準備
+        messages.push({
+          type: 'text',
+          text: list
+        });
+
+        // イベント分ループ
         events.map((event, i) => {
-          const start = event.start.dateTime;
+          let start = event.start.dateTime;
           let description = '';
+          let end = new Date();
           if (start) {
             date = formatTime(new Date(start));
+            end = new Date(event.end.dateTime);
+            end.setTime(end.getTime() + 1000 * 60 * 60 * 9);
           }
 
-          // 備考スクレイピング
-          let index = event.description.indexOf('【備考】');
-          if (index !== -1) {
-            description = event.description.slice(index);
+          // 終日予定または終了前のイベント（最大4件）
+          if (count < 4 && (!start || now < end)) {
+            count++;
+            // 備考スクレイピング
+            let index = event.description.indexOf('【備考】');
+            if (index !== -1) {
+              description = event.description.slice(index);
+            }
+            // イベント詳細情報
+            messages.push({
+              type: 'text',
+              text: `${date} - ${event.summary}\n${description}`
+            });
           }
-
-          messages.push({
-            type: 'text',
-            text: `${date} - ${event.summary}\n${description}`
-          });
+          list += `${date} - ${event.summary}\n`;
         });
-        // console.log(lineEvent, messages);
+
+        // イベント内容一覧置換
+        messages[0].text = list;
         client.replyMessage(lineEvent.replyToken, messages);
       } else {
         client.replyMessage(lineEvent.replyToken, {
