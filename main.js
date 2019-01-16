@@ -118,7 +118,6 @@ const getAccessToken = (OAuth2Client, callback, lineEvent) => {
 // Google カレンダーから予定を取得
 const listEvents = (auth, lineEvent) => {
   const calendar = google.calendar({ version: 'v3', auth });
-  let date = '終日予定';
   let now = new Date();
   let year = now.getFullYear();
   let month = now.getMonth() + 1;
@@ -130,7 +129,8 @@ const listEvents = (auth, lineEvent) => {
   now.setTime(now.getTime() + 1000 * 60 * 60 * 9);
   let timeMin = new Date(today).toISOString();
   let timeMax = new Date(tomorrow).toISOString();
-  let list = '';
+  let date = '終日予定';
+  let list = '【イベント一覧】(hee)\n';
   let count = 0;
   let messages = [];
 
