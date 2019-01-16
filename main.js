@@ -37,13 +37,13 @@ const handleEvent = event => {
   }
   let message = 'すみません、よくわかりません。';
 
-  if (event.message.text == '今日の予定') {
-    message = '確認中です...';
+  if (event.message.text == 'Today Events') {
+    message = 'cheking...';
     getEvents(event.source.userId, 0);
   }
 
-  if (event.message.text == '明日の予定') {
-    message = '確認中です...';
+  if (event.message.text == 'Tomorrow Events') {
+    message = 'cheking...';
     getEvents(event.source.userId, 1);
   }
 
