@@ -42,9 +42,9 @@ const handleEvent = event => {
       return getEvents(event, 1);
     default:
       return client.replyMessage(event.replyToken, {
-        type:
-          'すみません、〈今日のイベント〉か〈明日のイベント〉と発言してみてください。',
-        text: message
+        type: 'text',
+        text:
+          'すみません、〈今日のイベント〉か〈明日のイベント〉と発言してみてください。'
       });
   }
 };
