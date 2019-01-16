@@ -139,7 +139,8 @@ const listEvents = (auth, lineEvent) => {
       timeMin: timeMin,
       maxResults: 5,
       singleEvents: true,
-      orderBy: 'startTime'
+      orderBy: 'startTime',
+      timeZone: 'Asia/Tokyo'
     },
     (err, res) => {
       if (err) {
