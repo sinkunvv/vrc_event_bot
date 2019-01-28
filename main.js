@@ -39,7 +39,7 @@ const handleEvent = event => {
     case '今日のイベント':
       return getEvents(event, 0);
     case '明日のイベント':
-      return getEvents(event, -1);
+      return getEvents(event, 1);
     default:
       return client.replyMessage(event.replyToken, {
         type: 'text',
