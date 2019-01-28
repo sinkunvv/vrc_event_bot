@@ -139,7 +139,6 @@ const listEvents = (auth, lineEvent) => {
       calendarId: '1b1et1slg27jm1rgdltu3mn2j4@group.calendar.google.com',
       timeMax: timeMax,
       timeMin: timeMin,
-      maxResults: 5,
       singleEvents: true,
       orderBy: 'startTime',
       timeZone: 'Asia/Tokyo'
@@ -167,6 +166,8 @@ const listEvents = (auth, lineEvent) => {
             end = new Date(event.end.dateTime);
             end.setTime(end.getTime() + 1000 * 60 * 60 * 9);
           }
+          // 当日のイベント一覧
+          list += `${date} - ${event.summary}\n`;
 
           // 終日予定または終了前のイベント（最大4件）
           if (count < 4 && (!start || now < end)) {
@@ -182,7 +183,6 @@ const listEvents = (auth, lineEvent) => {
               text: `${date} - ${event.summary}\n${description}`
             });
           }
-          list += `${date} - ${event.summary}\n`;
         });
 
         // イベント内容一覧置換
