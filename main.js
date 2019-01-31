@@ -119,9 +119,10 @@ const getAccessToken = (OAuth2Client, callback, lineEvent) => {
 const listEvents = (auth, lineEvent) => {
   const calendar = google.calendar({ version: 'v3', auth });
   let now = new Date();
+  now.setDate(now.getDate() + global.days);
   let year = now.getFullYear();
   let month = now.getMonth() + 1;
-  let day = now.getDate() + global.days;
+  let day = now.getDate();
   let today = new Date(year + '/' + month + '/' + day);
   today.setTime(today.getTime() + 1000 * 60 * 60 * 9);
   let tomorrow = new Date(today);
