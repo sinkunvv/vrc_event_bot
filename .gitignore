@@ -1,4 +1,4 @@
 node_modules
 credentials.json
 image/*
-test.js
+local.js
