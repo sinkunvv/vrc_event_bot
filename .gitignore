@@ -2,3 +2,4 @@ node_modules
 credentials.json
 image/*
 local.js
+token.json
